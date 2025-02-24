@@ -10,6 +10,10 @@ function AssignmentCreation({ onSubmit }) {
   const [rubricFile, setRubricFile] = useState(null);
   const navigate = useNavigate();
 
+  const handleRubricChange = (e) => {
+    setRubricFile(e.target.files[0]);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const assignmentData = {
@@ -57,7 +61,7 @@ function AssignmentCreation({ onSubmit }) {
           />
         </div>
         <div className="form-group">
-          <label>Assignment instructions:</label>
+          <label>Assignment Instructions:</label>
           <textarea
             value={explanation}
             onChange={(e) => setExplanation(e.target.value)}
@@ -71,11 +75,11 @@ function AssignmentCreation({ onSubmit }) {
           ></textarea>
         </div>
         <div className="form-group">
-          <label>Upload Rubric:</label>
+          <label>Upload Rubric (Text or Image):</label>
           <input
             type="file"
-            accept="image/*"
-            onChange={(e) => setRubricFile(e.target.files[0])}
+            accept="text/*,image/*"
+            onChange={handleRubricChange}
           />
         </div>
         <button type="submit" className="btn-primary">Create Assignment</button>
