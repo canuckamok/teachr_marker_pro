@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AssignmentCreation from './AssignmentCreation';
 import AssignmentUpload from './AssignmentUpload';
 import AssignmentResults from './AssignmentResults';
+import './App.css';
 
 function App() {
   const [assignmentData, setAssignmentData] = useState(null);
