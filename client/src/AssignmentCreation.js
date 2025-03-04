@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function AssignmentCreation({ onSubmit }) {
@@ -8,24 +8,64 @@ function AssignmentCreation({ onSubmit }) {
   const [context, setContext] = useState('');
   const [explanation, setExplanation] = useState('');
   const [rubricFile, setRubricFile] = useState(null);
+  const [rubricFileName, setRubricFileName] = useState('');
   const navigate = useNavigate();
 
+  // Load saved assignment data from localStorage when component mounts
+  useEffect(() => {
+    const savedData = localStorage.getItem('assignmentData');
+    
+    if (savedData) {
+      try {
+        const parsedData = JSON.parse(savedData);
+        
+        // Populate the form fields with saved data
+        setAssignmentName(parsedData.assignmentName || '');
+        setGradeLevel(parsedData.gradeLevel || '');
+        setSubject(parsedData.subject || '');
+        setContext(parsedData.context || '');
+        setExplanation(parsedData.explanation || '');
+        
+        // For file input, we can only store the filename, not the actual file
+        if (parsedData.rubricFileName) {
+          setRubricFileName(parsedData.rubricFileName);
+        }
+      } catch (error) {
+        console.error('Error parsing saved assignment data:', error);
+      }
+    }
+  }, []);
+
   const handleRubricChange = (e) => {
-    setRubricFile(e.target.files[0]);
+    if (e.target.files[0]) {
+      setRubricFile(e.target.files[0]);
+      setRubricFileName(e.target.files[0].name);
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
     const assignmentData = {
       assignmentName,
       gradeLevel,
       subject,
       context,
       explanation,
-      rubricFile,
+      rubricFile: null, // Can't store File objects in localStorage
+      rubricFileName: rubricFileName
     };
+    
+    // Save to localStorage
     localStorage.setItem('assignmentData', JSON.stringify(assignmentData));
+    
+    // Add the actual file object back for the onSubmit handler
+    assignmentData.rubricFile = rubricFile;
+    
+    // Call the onSubmit prop with the complete data
     onSubmit(assignmentData);
+    
+    // Navigate to the next page
     navigate('/upload-assignment');
   };
 
@@ -81,8 +121,11 @@ function AssignmentCreation({ onSubmit }) {
             accept="text/*,image/*"
             onChange={handleRubricChange}
           />
+          {rubricFileName && (
+            <p className="file-name">Current file: {rubricFileName}</p>
+          )}
         </div>
-        <button type="submit" className="btn-primary">Create Assignment</button>
+        <button type="submit" className="btn-primary">Continue to Upload</button>
       </form>
     </div>
   );
